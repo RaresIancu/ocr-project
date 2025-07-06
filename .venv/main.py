@@ -2,9 +2,18 @@ import pytesseract
 from PIL import Image
 from pdf2image import convert_from_path
 import os
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox, scrolledtext
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+if getattr(sys, 'frozen', False):
+    BASE_DIR = sys._MEIPASS
+else:
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+tesseract_path = os.path.join(BASE_DIR, "tesseract", "tesseract.exe")
+pytesseract.pytesseract.tesseract_cmd = tesseract_path
+os.environ['TESSDATA_PREFIX'] = os.path.join(BASE_DIR, "tesseract", "tessdata")
 
 root = None
 output_text = None
@@ -121,18 +130,4 @@ def selecteaza_folder_gui():
 
 
 if __name__ == "__main__":
-    raspuns = input("Alegi modul (1 = Consolă, 2 = Interfață grafică)? ")
-
-    if raspuns.strip() == "1":
-        folder = "documente_scanate"
-        rezultate = ocr_folder(folder)
-        for fisier, text in rezultate.items():
-            print(f"\n--- Text extras din {fisier} ---\n{text}")
-
-        text = ocr_pdf("./documente_scanate/pdfs/1.pdf")
-        print(text)
-
-    elif raspuns.strip() == "2":
-        porneste_gui()
-    else:
-        print("Opțiune invalidă. Închidere aplicație.")
+    porneste_gui()
